@@ -100,8 +100,16 @@
 
     [self performRecordAction:^(ABRecordRef recordRef) {
         compositeName = (NSString*)ABRecordCopyCompositeName(recordRef);
+        
+        if(compositeName == @"" || compositeName == nil) {
+            ABMultiValueRef emailMultiValue = ABRecordCopyValue(recordRef, kABPersonEmailProperty);
+            NSArray *emailAddresses = (NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue);
+            compositeName = [emailAddresses objectAtIndex:0];
+            CFRelease(emailMultiValue);
+            CFRelease(emailAddresses);
+        }
     } waitUntilDone:YES];
-
+    
     return [compositeName autorelease];
 }
 
