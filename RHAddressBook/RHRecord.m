@@ -105,10 +105,10 @@
     NSString* compositeName = [(__bridge NSString*)compositeNameRef copy];
     if(compositeName == @"" || compositeName == nil) {
         ABMultiValueRef emailMultiValue = ABRecordCopyValue(_recordRef, kABPersonEmailProperty);
-        NSArray *emailAddresses = (NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue);
+        NSArray *emailAddresses = (__bridge NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue);
         compositeName = [emailAddresses objectAtIndex:0];
         CFRelease(emailMultiValue);
-        CFRelease(emailAddresses);
+        CFRelease((__bridge CFTypeRef)(emailAddresses));
     }
     if (compositeNameRef) CFRelease(compositeNameRef);
     
