@@ -108,7 +108,6 @@
         NSArray *emailAddresses = (__bridge NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue);
         compositeName = [emailAddresses objectAtIndex:0];
         CFRelease(emailMultiValue);
-        CFRelease((__bridge CFTypeRef)(emailAddresses));
     }
     if (compositeNameRef) CFRelease(compositeNameRef);
     
