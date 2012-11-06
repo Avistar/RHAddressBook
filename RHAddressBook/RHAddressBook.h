@@ -49,11 +49,21 @@ extern NSString * const RHAddressBookExternalChangeNotification;
 //notification fired when a person and address pair has been geocoded (info dict contains personID and addressID as [NSNumber integerValue])
 extern NSString * const RHAddressBookPersonAddressGeocodeCompleted;
 
+//authorization status enum.
+typedef enum RHAuthorizationStatus {
+    RHAuthorizationStatusNotDetermined = 0,
+    RHAuthorizationStatusRestricted,
+    RHAuthorizationStatusDenied,
+    RHAuthorizationStatusAuthorized
+} RHAuthorizationStatus;
+
+
 @interface RHAddressBook : NSObject
 
-+(BOOL)addressBookAvailable; // iOS6+ Returns true if the user has granted access to the address book. May promt the user for access. (Pre iOS6, always true)
+-(id)init; //create an instance of the addressbook (iOS6+ may return nil, signifying an access error. Error is logged to console)
 
--(id)init; //create an instance of the addressbook (iOS6+ may return nil, signifying an access error.)
++(RHAuthorizationStatus)authorizationStatus; // pre iOS6+ will always return RHAuthorizationStatusAuthorized
+-(void)requestAuthorizationWithCompletion:(void (^)(bool granted, NSError* error))completion; //completion block is always called, you only need to call authorize if ([RHAddressBook authorizatonStatus] != RHAuthorizationStatusAuthorized). Pre, iOS6 completion block is always called with granted=YES. The block is called on an arbitrary queue, so dispatch_async to the main queue for any UI updates.
 
 //any access to the underlying ABAddressBook should be done inside this block wrapper below.
 //from the addressbook programming guide... Important: Instances of ABAddressBookRef cannot be used by multiple threads. Each thread must make its own instance by calling ABAddressBookCreate.
@@ -66,11 +76,13 @@ extern NSString * const RHAddressBookPersonAddressGeocodeCompleted;
 -(RHSource*)sourceForABRecordID:(ABRecordID)sourceID; //returns nil if not found in the current ab, eg unsaved record from another ab.
 
 -(NSArray*)groups;
+-(long)numberOfGroups;
 -(NSArray*)groupsInSource:(RHSource*)source;
 -(RHGroup*)groupForABRecordRef:(ABRecordRef)groupRef; //returns nil if ref not found in the current ab, eg unsaved record from another ab. if the passed recordRef does not belong to the current addressbook, the returned person objects underlying personRef will differ from the passed in value. This is required in-order to maintain thread safety for the underlying AddressBook instance.
 -(RHGroup*)groupForABRecordID:(ABRecordID)groupID; //returns nil if not found in the current ab, eg unsaved record from another ab.
 
 -(NSArray*)people;
+-(long)numberOfPeople;
 -(NSArray*)peopleOrderedBySortOrdering:(ABPersonSortOrdering)ordering;
 -(NSArray*)peopleOrderedByUsersPreference; //preferred
 -(NSArray*)peopleOrderedByFirstName;
