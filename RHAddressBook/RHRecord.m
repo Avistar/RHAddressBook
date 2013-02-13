@@ -103,7 +103,7 @@
     } waitUntilDone:YES];
 
     NSString* compositeName = [(__bridge NSString*)compositeNameRef copy];
-    if(compositeName == @"" || compositeName == nil) {
+    if([compositeName isEqual: @""] || compositeName == nil) {
         ABMultiValueRef emailMultiValue = ABRecordCopyValue(_recordRef, kABPersonEmailProperty);
         NSArray *emailAddresses = (__bridge NSArray *)ABMultiValueCopyArrayOfAllValues(emailMultiValue);
         compositeName = [emailAddresses objectAtIndex:0];
